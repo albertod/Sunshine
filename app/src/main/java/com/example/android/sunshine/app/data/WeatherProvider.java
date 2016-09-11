@@ -196,8 +196,7 @@ public class WeatherProvider extends ContentProvider {
                         selectionArgs,
                         null,
                         null,
-                        sortOrder
-                );
+                        sortOrder);
                 break;
             }
             // "location"
@@ -209,8 +208,7 @@ public class WeatherProvider extends ContentProvider {
                         selectionArgs,
                         null,
                         null,
-                        sortOrder
-                );
+                        sortOrder);
                 break;
             }
 
