@@ -15,9 +15,11 @@
  */
 package com.example.android.sunshine.app;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -25,6 +27,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 
 import org.json.JSONArray;
@@ -109,7 +112,29 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         // Students: First, check if the location with this city name exists in the db
         // If it exists, return the current ID
         // Otherwise, insert it using the content resolver and the base URI
-        return -1;
+        long locationId;
+
+        Cursor locationCursor = mContext.getContentResolver()
+                .query(WeatherContract.LocationEntry.CONTENT_URI,
+                new String[] {WeatherContract.LocationEntry._ID},
+                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
+                new String[] {locationSetting}, null);
+
+        if (locationCursor.moveToFirst()) {
+            int locationIndex = locationCursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            locationId = locationCursor.getLong(locationIndex);
+        } else {
+            ContentValues content = new ContentValues();
+            content.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
+            content.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
+            content.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
+            content.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
+
+            Uri resultUri = mContext.getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI, content);
+            locationId = ContentUris.parseId(resultUri);
+        }
+        locationCursor.close();
+        return locationId;
     }
 
     /*
@@ -265,7 +290,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
             // add to database
             if ( cVVector.size() > 0 ) {
-                // Student: call bulkInsert to add the weatherEntries to the database here
+                mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, (ContentValues[]) cVVector.toArray());
             }
 
             // Sort order:  Ascending, by date.
