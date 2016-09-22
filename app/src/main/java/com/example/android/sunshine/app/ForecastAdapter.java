@@ -48,7 +48,10 @@ public class ForecastAdapter extends CursorAdapter {
         else
             layoutId = R.layout.list_item_forecast;
 
-        return LayoutInflater.from(context).inflate(layoutId, parent, false);
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+        return view;
     }
 
     /*
@@ -57,26 +60,38 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
-        TextView descriptionView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
-        descriptionView.setText(description);
+        viewHolder.forecastTV.setText(description);
 
         boolean isMetric = Utility.isMetric(context);
 
         double maxTemp = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
-        TextView maxTempView = (TextView)view.findViewById(R.id.list_item_high_textview);
-        maxTempView.setText(Utility.formatTemperature(maxTemp, isMetric));
+        viewHolder.maxTempTV.setText(Utility.formatTemperature(maxTemp, isMetric));
 
         double minTemp = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
-        TextView minTempView = (TextView) view.findViewById(R.id.list_item_low_textview);
-        minTempView.setText(Utility.formatTemperature(minTemp, isMetric));
+        viewHolder.minTempTV.setText(Utility.formatTemperature(minTemp, isMetric));
 
         long date = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
-        TextView dateView = (TextView) view.findViewById(R.id.list_item_date_textview);
-        dateView.setText(Utility.getFriendlyDayString(context, date));
+        viewHolder.dateTV.setText(Utility.getFriendlyDayString(context, date));
 
-        ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
-        iconView.setImageResource(R.drawable.ic_launcher);
+        viewHolder.iconIV.setImageResource(R.drawable.ic_launcher);
+    }
+
+    private static class ViewHolder {
+        TextView minTempTV;
+        TextView maxTempTV;
+        TextView dateTV;
+        TextView forecastTV;
+        ImageView iconIV;
+
+        private ViewHolder(View view) {
+            minTempTV = (TextView) view.findViewById(R.id.list_item_low_textview);
+            maxTempTV = (TextView) view.findViewById(R.id.list_item_high_textview);
+            dateTV = (TextView) view.findViewById(R.id.list_item_date_textview);
+            forecastTV = (TextView) view.findViewById(R.id.list_item_forecast_textview);
+            iconIV = (ImageView) view.findViewById(R.id.list_item_icon);
+        }
     }
 }
