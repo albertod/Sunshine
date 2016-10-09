@@ -62,6 +62,15 @@ public class ForecastAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
+        // For today item view we use the Art resource
+        // For other we use the black&white icon res
+        if (getItemViewType(cursor.getPosition()) == VIEW_TYPE_TODAY)
+            viewHolder.iconIV.setImageResource(Utility
+                    .getArtResourceForWeatherCondition(cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID)));
+        else
+            viewHolder.iconIV.setImageResource(Utility
+                    .getIconResourceForWeatherCondition(cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID)));
+
         String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
         viewHolder.forecastTV.setText(description);
 
@@ -75,8 +84,6 @@ public class ForecastAdapter extends CursorAdapter {
 
         long date = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
         viewHolder.dateTV.setText(Utility.getFriendlyDayString(context, date));
-
-        viewHolder.iconIV.setImageResource(R.drawable.ic_launcher);
     }
 
     private static class ViewHolder {
