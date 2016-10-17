@@ -17,17 +17,20 @@ public class ForecastAdapter extends CursorAdapter {
 
     private final int VIEW_TYPE_TODAY = 0;
     private final int VIEW_TYPE_FUTURE_DAY = 1;
-
+    private boolean mNonViewTypeToday; // Used for table UI that do not have large view for today's date
     private final int VIEW_TYPE_COUNT = 2;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
+    public void setNonViewTypeToday(boolean nonViewTypeToday) {
+        mNonViewTypeToday = nonViewTypeToday;
+    }
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+        return (position == 0 && !mNonViewTypeToday) ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
     }
 
     @Override

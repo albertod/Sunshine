@@ -45,6 +45,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private static final String LIST_ITEM_SELECTED_POSITION = "LIST_ITEM_SELECTED_POSITION";
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
+    private boolean mIsTwoPanes;
 
     private static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -117,11 +118,19 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         return super.onOptionsItemSelected(item);
     }
 
+    public void setTwoPanes(boolean twoPanes) {
+        mIsTwoPanes = twoPanes;
+        if (mForecastAdapter != null)
+            mForecastAdapter.setNonViewTypeToday(twoPanes);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
 
         // The CursorAdapter will take data from our cursor and populate the ListView.
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        // Set if two panes (Tablet) or 1 pane view
+        mForecastAdapter.setNonViewTypeToday(mIsTwoPanes);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -204,4 +213,5 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLoaderReset(Loader<Cursor> loader) {
         mForecastAdapter.swapCursor(null);
     }
+
 }
