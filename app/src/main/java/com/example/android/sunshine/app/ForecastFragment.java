@@ -15,10 +15,7 @@
  */
 package com.example.android.sunshine.app;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
+import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,7 +34,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
-import com.example.android.sunshine.app.service.SunshineService;
+import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 
 
 /**
@@ -51,6 +48,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
     private boolean mIsTwoPanes;
+    // A content resolver for accessing the provider
+    private ContentResolver mResolver;
+
+    // Sync interval constants
+    public static final long SECONDS_PER_MINUTE = 15L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 1L;
+    public static final long SYNC_INTERVAL = SYNC_INTERVAL_IN_MINUTES * SECONDS_PER_MINUTE;
+
+
 
     private static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -103,6 +109,16 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
+
+        // SyncAdapter
+        // Get the content resolver for your app
+        mResolver = getActivity().getContentResolver();
+        /*
+         * Turn on periodic syncing
+         */
+        String authority = getContext().getString(R.string.content_authority);
+        ContentResolver.addPeriodicSync(SunshineSyncAdapter.getSyncAccount(getContext()),
+                authority, Bundle.EMPTY, SYNC_INTERVAL);
     }
 
     @Override
@@ -168,12 +184,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        //Set intent of use BaseReceiver
-        Intent alarmIntent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
-        alarmIntent.putExtra(SunshineService.LOCATION_QUERY_EXTRA, Utility.getPreferredLocation(getContext()));
-        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-        PendingIntent alarmPendingIntent = PendingIntent.getBroadcast(getActivity(), 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, alarmPendingIntent);
+        SunshineSyncAdapter.syncImmediately(getContext());
     }
 
     public void onLocationChanged() {
