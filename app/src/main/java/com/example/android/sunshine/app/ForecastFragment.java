@@ -92,7 +92,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
      * DetailFragmentCallback for when an item has been selected.
      */
     public interface Callback {
-        public void onItemSelected(Uri dateUri);
+        void onItemSelected(Uri dateUri);
     }
 
     public ForecastFragment() {

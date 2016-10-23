@@ -23,6 +23,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
+
 public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback{
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -57,6 +59,9 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             if (getSupportActionBar() != null)
                 getSupportActionBar().setElevation(0f);
         }
+
+        // Initialize sync adapter
+        SunshineSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
