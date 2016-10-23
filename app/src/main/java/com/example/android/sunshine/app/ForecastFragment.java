@@ -113,12 +113,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // SyncAdapter
         // Get the content resolver for your app
         mResolver = getActivity().getContentResolver();
-        /*
-         * Turn on periodic syncing
-         */
-        String authority = getContext().getString(R.string.content_authority);
-        ContentResolver.addPeriodicSync(SunshineSyncAdapter.getSyncAccount(getContext()),
-                authority, Bundle.EMPTY, SYNC_INTERVAL);
     }
 
     @Override
